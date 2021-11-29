@@ -26,8 +26,8 @@ class DataGenerator(tf.keras.utils.Sequence):
         Loads the paths to the images and their corresponding labels from the database directory
         """
         # TODO your code here
-        paths = glob.glob(root_dir + "/**/*.jpg", recursive=True)
-        labels = [path.split("\\")[-2] for path in paths]
+        paths = glob.glob(root_dir + "/**/hair_*.jpg", recursive=True)
+        labels = [path.split(".")[-2].split("_")[-1] for path in paths]
         self.class_names = list(set(labels))
         sorted(self.class_names)
 
@@ -79,7 +79,7 @@ class DataGenerator(tf.keras.utils.Sequence):
 
 
 if __name__ == '__main__':
-    train_generator = DataGenerator("F:/UBB_Uni/an 3/Licenta/datasets/hair_types", 32, (512, 512, 3), 3)
+    train_generator = DataGenerator("F:/UBB_Uni/an 3/Licenta/hair_pictures", 32, (200, 200, 3), 3)
     label_names = train_generator.class_names
     # assert len(label_names) == 37
     batch_x, batch_y = train_generator[0]
