@@ -17,7 +17,8 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.shuffle = shuffle
         # load the data from the root directory
         self.class_names = []
-        self.data, self.labels = self.get_data(db_dir)
+        self.data, self.labels = self.get_data_from_folders(db_dir)
+        self.batch_size = len(self.data)
         self.indices = np.arange(len(self.data))
         self.on_epoch_end()
 
@@ -35,6 +36,35 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.labels = np.array([self.class_names.index(label) for label in labels])
         return self.data, self.labels
 
+    def get_data_from_folders(self, root_dir):
+        """"
+        Loads the paths to the images and their corresponding labels from the database directory
+        """
+        # TODO your code here
+        paths = glob.glob(root_dir + "/_*/*.jpg")
+        labels = [path.split("\\")[-2][1:] for path in paths]
+        self.class_names = list(set(labels))
+        sorted(self.class_names)
+
+        self.data = paths
+        self.labels = np.array([self.class_names.index(label) for label in labels])
+        return self.data, self.labels
+
+    def get_data_from_folders_less_classes(self, root_dir):
+        """"
+        Loads the paths to the images and their corresponding labels from the database directory
+        """
+        # TODO your code here
+        paths = glob.glob(root_dir + "/_*/*.jpg")
+        labels = [path.split("\\")[-2][1] for path in paths]
+        self.class_names = list(set(labels))
+        sorted(self.class_names)
+
+        self.data = paths
+        self.labels = np.array([self.class_names.index(label) for label in labels])
+        return self.data, self.labels
+
+
     def __len__(self):
         """
         Returns the number of batches per epoch: the total size of the dataset divided by the batch size
@@ -46,14 +76,15 @@ class DataGenerator(tf.keras.utils.Sequence):
         Generates a batch of data
         """
         batch_indices = self.indices[index*self.batch_size : (index+1)*self.batch_size]
-        batch_x = [] # TODO load the image from batch_indices
-        for i in batch_indices:
+        batch_x = np.zeros(shape=(len(batch_indices), 128, 128, 3))  # TODO load the image from batch_indices
+        for indx, i in enumerate(batch_indices):
             image = cv2.imread(self.data[i])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = self.square_image(image)
             image = cv2.resize(image, (self.input_shape[0], self.input_shape[1]))
-            batch_x.append(image)
-        batch_y = self.labels[batch_indices] # TODO load the corresponding labels of the images you loaded
+            # batch_x.append(image)
+            batch_x[indx] = image
+        batch_y = self.labels[batch_indices]  # TODO load the corresponding labels of the images you loaded
         # optionally you can use: batch_y = tf.keras.utils.to_categorical(batch_y, num_classes=self.num_classes)
         return batch_x, batch_y
 
