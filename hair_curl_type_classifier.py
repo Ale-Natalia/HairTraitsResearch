@@ -1,4 +1,6 @@
 # TensorFlow and tf.keras
+import math
+
 import tensorflow as tf
 
 # Helper libraries
@@ -24,12 +26,20 @@ model = tf.keras.Sequential([
 ])
 """
 
+
+def my_metric_fn(y_true, y_pred):
+    print('true: {}, predicted: {}'.format(y_true, y_pred))
+    prediction_difference = y_true - y_pred
+    acceptablePredictions = np.count_nonzero(-1 <= prediction_difference <= 1)
+    return acceptablePredictions // len(prediction_difference)  # Note the `axis=-1`
+
+
 # model = build_mini_resnet((300, 300, 3), 12)
 # model = build_hair_classifier_model((128, 128, 3), 12)
 model = build_hair_classifier_model_knn_101((128, 128, 3), 12)
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),  # for multi-class classification
-              metrics=['accuracy'])
+              metrics=['accuracy', my_metric_fn])
 model.fit(batch_data, batch_labels, epochs=10, batch_size=32)
 loss = model.evaluate(batch_data, batch_labels)
 print(loss)
