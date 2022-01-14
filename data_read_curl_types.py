@@ -41,7 +41,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         Loads the paths to the images and their corresponding labels from the database directory
         """
         # TODO your code here
-        paths = glob.glob(root_dir + "/_*/*.jpg")
+        paths = glob.glob(root_dir + "/_*/hair_*.jpg")
         labels = [path.split("\\")[-2][1:] for path in paths]
         self.class_names = list(set(labels))
         sorted(self.class_names)
@@ -63,6 +63,24 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.data = paths
         self.labels = np.array([self.class_names.index(label) for label in labels])
         return self.data, self.labels
+
+    def get_images_from_paths_array(self, paths):
+        """
+
+        :param paths:
+        :return: cv images found at paths
+        """
+        images = np.zeros(shape=(len(paths), 128, 128, 3))  # TODO load the image from batch_indices
+        for i, path in enumerate(paths):
+            image = cv2.imread(path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = self.square_image(image)
+            image = cv2.resize(image, (self.input_shape[0], self.input_shape[1]))
+            # batch_x.append(image)
+            images[i] = image
+        # optionally you can use: batch_y = tf.keras.utils.to_categorical(batch_y, num_classes=self.num_classes)
+        return images
+
 
 
     def __len__(self):

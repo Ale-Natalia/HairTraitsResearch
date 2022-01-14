@@ -26,7 +26,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         Loads the paths to the images and their corresponding labels from the database directory
         """
         # TODO your code here
-        paths = glob.glob(root_dir + "/**/*.jpg", recursive=True)
+        paths = glob.glob(root_dir + "/_**/*.jpg", recursive=True)
         labels = [path.split("\\")[-2] for path in paths]
         self.class_names = list(set(labels))
         sorted(self.class_names)

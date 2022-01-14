@@ -8,7 +8,9 @@ from data_read_curl_types import *
 def resnet_block(input, filter_size=3, no_filters=16):
     layer1 = Conv2D(kernel_size=filter_size, filters=no_filters, padding="same")(input)
     layer2 = Conv2D(kernel_size=filter_size, filters=no_filters, padding="same")(layer1)
-    return Add()([input, layer2])
+    batchNormLayer = BatchNormalization()()
+    conv2Dlayers = Add()([input, layer2])
+    return Add()([conv2Dlayers, batchNormLayer])
 
 
 def build_mini_resnet(input_size, num_classes):
